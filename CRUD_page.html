@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Crude</title>
+	<script src="https://kit.fontawesome.com/3234c2ef4e.js" crossorigin="anonymous"></script>
+	<style>
+		.flux1
+		{
+			border: 2px solid black;
+			height: 300px;
+			border-radius: 30px;
+			width: 30%;
+			padding: 30px 50px 80px 50px;
+			line-height: 50px;
+			margin: 20px 50px;
+			float: left;
+			background: linear-gradient(to right, rgb(15, 12, 41), rgb(48, 43, 99), rgb(36, 36, 62));
+		}
+		.flux2
+		{
+			border: 2px solid black;
+			
+			height: 500px;
+			width: 40%;
+			padding: 0px 50px;
+			margin: 20px 50px;
+			float: right;
+			background: linear-gradient(to right, rgb(15, 12, 41), rgb(48, 43, 99), rgb(36, 36, 62));
+		
+			overflow: scroll;
+			overflow: auto;
+		}
+		#row
+		{
+			font-size: 17px;
+			color: white;
+		}
+		#delbtn
+		{
+			background: red;
+			color: black;
+			text-decoration: none;
+			border: 1px solid black;
+			border-radius: 10px;
+			padding: 0px 13px;
+		}
+		#editbtn
+		{
+			background: green;
+			color: white;
+			text-decoration: none;
+			border: 1px solid black;
+			border-radius: 10px;
+			padding: 0px 13px;
+		}
+	</style>
+</head>
+<body style="background: linear-gradient(to right, rgb(241, 39, 17), rgb(245, 175, 25));; background-size: 100% 100%;">
+	<p style="font-size: 50px;text-align: center;color: black;"><i class="fa-solid fa-user-graduate"></i> <U><b>CRUD WEBPAGE</b></U></p>
+	<hr>
+	<div>
+		<div class="flux1">
+			<h1 style="color: white; text-align: center; font-size: 40px;"><i class="fa-regular fa-rectangle-list"></i> <u>Input Student Data</u></h1>
+			<table>
+				<tr>
+					<td style="font-size: 25px; padding-right: 30px; color: white;"><b>Name:<b></td>
+					<td><input type="text" name="name" id="name" style="width: 300px; height:30px; font-size: 20px"></td>
+				</tr>
+				<tr>
+					<td style="font-size: 25px; color: white;"><strong>Roll No:</strong></td>
+					<td><input type="text" name="roll" id="roll" style="width: 300px; height:30px; font-size: 20px"></td>
+				</tr>
+				<tr>
+					<td style="font-size: 25px;color: white;"><b>Subject: </b></td>
+					<td><input type="text" name="subject" id="sub" style="width: 300px; height:30px;font-size: 20px;"></td>
+				</tr>
+				
+				<tr>
+					<td></td>
+					<td><button style ="background: green; color: black; font-size: 25px; padding: 5px 25px;border-radius: 20px; margin-top: 20px;" onclick="manage()">Submit</button></td>
+				</tr>
+			</table>
+			<div id="msg" style="color: red; text-align: right;"></div>
+		</div>
+		
+		<div class="flux2">
+			<h1 style="color: white; text-align: center;"><i class="fa-regular fa-file-lines"></i> Student Record</h1>
+			<table border="2" style="margin: 30px 12px; width: 600px; text-align: center; border: 2px solid white;">
+				<thead style="background: linear-gradient(to right, rgb(78, 84, 200), rgb(143, 148, 251)); color: white; font-weight: strong;font-size: 23px;">
+					<td>S.no</td>
+					<td>Name</td>
+					<td>Roll no</td>
+					<td>Subject</td>
+					<td>Action</td>
+				</thead>
+				<tbody id="root"></tbody>
+			</table>
+		</div>
+	</div>
+
+
+	<script>
+		select();
+		let id = "no";
+		function manage() {
+			let name = document.getElementById('name').value;
+			let roll = document.getElementById('roll').value;
+			let sub = document.getElementById('sub').value;
+
+			if (name=="") {
+				document.getElementById("msg").innerHTML = "please enter the name";
+			}
+			else
+			{
+				if (id == "no") 
+				{
+					let data = [name,roll,sub];
+					let ar = JSON.parse(localStorage.getItem("CRUD"));
+					if (ar == null) 
+					{
+						let arr = new Array;
+						arr[0] = data;
+						localStorage.setItem("CRUD", JSON.stringify(arr));
+					}
+					else
+					{
+						ar.push(data);
+						localStorage.setItem("CRUD", JSON.stringify(ar));
+					}
+					document.getElementById("msg").innerHTML = "New data added";
+				}
+				else
+				{
+					let data = [name,roll,sub];
+					let ar = JSON.parse(localStorage.getItem("CRUD"));
+					ar[id] = data;
+					localStorage.setItem("CRUD", JSON.stringify(ar));
+					document.getElementById("msg").innerHTML = "Value Updated";
+				}
+				document.getElementById('name').value = "";
+				document.getElementById('roll').value = "";
+				document.getElementById('sub').value = "";
+			}
+			select();
+		}
+
+		function select() {
+			let ar = JSON.parse(localStorage.getItem("CRUD"));
+			let HTML = "";
+			let s = 1;
+			if(ar != null){
+				for(let k in ar){
+					let j = 0;
+					HTML += `<tr id="row"><td>${s}</td><td>${ar[k][j]}</td><td>${ar[k][++j]}</td><td>${ar[k][++j]}</td><td><a href = "javascript:void(0)" id='editbtn'; onclick='editdata(${k})'>edit</a> <a href = 'javascript:void(0)' id="delbtn"; onclick="deletedata(${k})">delete</a></td></tr>`
+					s++;
+				}
+				document.getElementById("root").innerHTML = HTML;
+			}
+		}
+
+		function deletedata(r) {
+			let ar = JSON.parse(localStorage.getItem("CRUD"));
+			ar.splice(r,1);
+			localStorage.setItem("CRUD", JSON.stringify(ar));
+			select();
+		}
+
+		function editdata(r) {
+			let ar = JSON.parse(localStorage.getItem("CRUD"));
+			let data = ar[r];
+			id = r;
+			document.getElementById("name").value = data[0];
+			document.getElementById("roll").value = data[1];			
+			document.getElementById("sub").value = data[2];			
+		}
+
+	</script>
+</body>
+</html>
